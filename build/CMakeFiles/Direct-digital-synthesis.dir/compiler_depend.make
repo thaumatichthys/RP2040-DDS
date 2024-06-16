@@ -3113,6 +3113,12 @@ CMakeFiles/Direct-digital-synthesis.dir/main.cpp.obj: ../main.cpp \
   C:/VSARM/sdk/pico/pico-sdk/src/rp2040/hardware_regs/include/hardware/regs/uart.h \
   C:/VSARM/sdk/pico/pico-sdk/src/rp2040/hardware_regs/include/hardware/regs/dreq.h \
   C:/VSARM/sdk/pico/pico-sdk/src/rp2_common/pico_stdio_usb/include/pico/stdio_usb.h \
+  C:/VSARM/sdk/pico/pico-sdk/src/rp2_common/hardware_clocks/include/hardware/clocks.h \
+  C:/VSARM/sdk/pico/pico-sdk/src/rp2040/hardware_structs/include/hardware/structs/clocks.h \
+  C:/VSARM/sdk/pico/pico-sdk/src/rp2040/hardware_regs/include/hardware/regs/clocks.h \
+  C:/VSARM/sdk/pico/pico-sdk/src/rp2_common/hardware_vreg/include/hardware/vreg.h \
+  C:/VSARM/sdk/pico/pico-sdk/src/rp2040/hardware_structs/include/hardware/structs/vreg_and_chip_reset.h \
+  C:/VSARM/sdk/pico/pico-sdk/src/rp2040/hardware_regs/include/hardware/regs/vreg_and_chip_reset.h \
   ../DDS.h \
   C:/VSARM/sdk/pico/pico-sdk/src/rp2_common/hardware_dma/include/hardware/dma.h \
   C:/VSARM/sdk/pico/pico-sdk/src/rp2040/hardware_structs/include/hardware/structs/dma.h \
