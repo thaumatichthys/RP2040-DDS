@@ -10,12 +10,20 @@
     accumulator. Then use this with a lookup table to synthesize an accurate 
     frequency.
 
+    Updated June 16: Previously the channels repeatedly triggered eachother in a chain, 
+    but that limited the clock speed to around 1/18 the system clock. I changed the DMAs 
+    to each run separately and in parallel, with a maximum, 0xFFFFFFFF value written to 
+    transfer count. The DDS now can only run for around 40-ish seconds before needing to 
+    be restarted, but now it can run at 1/6 the clock speed, so three times faster. If 
+    you are using the DDS for low frequencies only, I suggest you use the old one.
+
+        four DMAs run in parallel.
 
         Preload lut_address high bytes with the address of lut[0]
-        DMA0: sniffer enabled, copy increment to dummy, trigger DMA1
-        DMA1: copy SNIFF_DATA(high byte only) to address(low byte), trigger DMA2
-        DMA2: copy address into DMA3 read address, trigger DMA3
-        DMA3: copy into PIO, retrigger DMA0
+        DMA0: sniffer enabled, copy increment to dummy
+        DMA1: copy SNIFF_DATA(high byte only) to address(low byte)
+        DMA2: copy address into DMA3 read address
+        DMA3: copy into PIO
 
     
     The PIO implementation is very crude and may break when not using PIO0 SM0. 
@@ -44,7 +52,7 @@ volatile uint32_t lut_address;
 // ======================= PIO ======================= //
 
 uint sm;
-const float clkdiv = 9; // 9 seems to be the fastest it can go :/
+const float clkdiv = 3; // 3 seems to be the fastest it can go
 uint dac_offset;
 
 // ======================= MISC ====================== //
@@ -58,7 +66,7 @@ void InitDDS(uint32_t clockFreq) {
     dds_clock = clockFreq / (2 * clkdiv);
 
     for (int i = 0; i < 256; i++) {
-        lut[i] = (cos((float) i * 2 * 3.14159f / 256.0f) + 1.0f) * 127;
+        lut[i] = (sin((float) i * 2 * 3.14159f / 256.0f) + 1.0f) * 127;
     }
 
 
@@ -85,7 +93,7 @@ void InitDDS(uint32_t clockFreq) {
     channel_config_set_read_increment(&dma0_cfg, false);
     channel_config_set_write_increment(&dma0_cfg, false);
     channel_config_set_sniff_enable(&dma0_cfg, true);
-    channel_config_set_chain_to(&dma0_cfg, dma1_chan);
+    //channel_config_set_chain_to(&dma0_cfg, dma1_chan);
     channel_config_set_dreq(&dma0_cfg, DREQ_PIO0_TX0);
     channel_config_set_enable(&dma0_cfg, true);
     channel_config_set_irq_quiet(&dma0_cfg, true);
@@ -95,7 +103,7 @@ void InitDDS(uint32_t clockFreq) {
     channel_config_set_transfer_data_size(&dma1_cfg, DMA_SIZE_8);
     channel_config_set_read_increment(&dma1_cfg, false);
     channel_config_set_write_increment(&dma1_cfg, false);
-    channel_config_set_chain_to(&dma1_cfg, dma2_chan);
+    //channel_config_set_chain_to(&dma1_cfg, dma2_chan);
     channel_config_set_enable(&dma1_cfg, true);
     channel_config_set_irq_quiet(&dma1_cfg, true);
 
@@ -110,7 +118,7 @@ void InitDDS(uint32_t clockFreq) {
     channel_config_set_transfer_data_size(&dma3_cfg, DMA_SIZE_8);
     channel_config_set_read_increment(&dma3_cfg, true);
     channel_config_set_write_increment(&dma3_cfg, false);
-    channel_config_set_chain_to(&dma3_cfg, dma0_chan);
+    //channel_config_set_chain_to(&dma3_cfg, dma0_chan);
     channel_config_set_enable(&dma3_cfg, true);
     channel_config_set_irq_quiet(&dma3_cfg, true);
 
@@ -121,7 +129,7 @@ void InitDDS(uint32_t clockFreq) {
         &dma0_cfg,
         &dummy,
         &increment,
-        1,
+        0xFFFFFFFF,
         false
     );
 
@@ -132,7 +140,7 @@ void InitDDS(uint32_t clockFreq) {
         &lut_address,
         (const volatile int*)(DMA_BASE + 0x438 + 3), // about the +3: we are reading the most significant 8 bits of the SNIFF_DATA register. 
         // this effectively sets the phase accumulator resolution. +3 means a 32 bit phase accumulator, truncated down to 8 bits. +2 --> 24 bit, etc.
-        1,
+        0xFFFFFFFF,
         false
     );
 
@@ -141,7 +149,7 @@ void InitDDS(uint32_t clockFreq) {
         &dma2_cfg,
         &dma_hw->ch[dma3_chan].al3_read_addr_trig,
         &lut_address,
-        1,
+        0xFFFFFFFF,
         false
     );
 
@@ -150,16 +158,25 @@ void InitDDS(uint32_t clockFreq) {
         &dma3_cfg,
         pio0->txf,
         &dummy, // this is irrelevant (DMA2 overwrites this)
-        1,
+        0xFFFFFFFF,
         false
     );
-    
-    dma_channel_start(dma0_chan);
 }
 
 uint32_t ChangeDDSFreq(double requestedFreq) {
     // See https://www.analog.com/en/resources/analog-dialogue/articles/all-about-direct-digital-synthesis.html
     // Fo = M * Fclock / (2^n) | n = 32
     increment = round(pow(2, 32) * requestedFreq / (double) dds_clock);
+
+    dma_channel_abort(dma0_chan);
+    dma_channel_abort(dma1_chan);
+    dma_channel_abort(dma2_chan);
+    dma_channel_abort(dma3_chan);
+
+    dma_channel_start(dma0_chan);
+    dma_channel_start(dma1_chan);
+    dma_channel_start(dma2_chan);
+    dma_channel_start(dma3_chan);
+
     return (uint64_t) increment * dds_clock / ((uint64_t) 1 << 32);
 }

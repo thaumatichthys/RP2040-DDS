@@ -18,7 +18,7 @@ int main() {
 
     InitDDS(420000000);
 
-    ChangeDDSFreq(1234.56);
+    ChangeDDSFreq(1234567);
     
     while(1) {
         gpio_put(25, 1);

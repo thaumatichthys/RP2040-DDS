@@ -16,8 +16,8 @@
 			"find_package",
 			"pico_add_uf2_output",
 			"pico_add_extra_outputs",
-			"pico_define_boot_stage2",
 			"pico_generate_pio_header",
+			"pico_define_boot_stage2",
 			"target_compile_definitions",
 			"target_include_directories"
 		],
@@ -77,18 +77,6 @@
 			{
 				"command" : 6,
 				"file" : 0,
-				"line" : 36,
-				"parent" : 0
-			},
-			{
-				"command" : 2,
-				"file" : 4,
-				"line" : 74,
-				"parent" : 8
-			},
-			{
-				"command" : 7,
-				"file" : 0,
 				"line" : 27,
 				"parent" : 0
 			},
@@ -96,6 +84,18 @@
 				"command" : 2,
 				"file" : 2,
 				"line" : 28,
+				"parent" : 8
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 36,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 4,
+				"line" : 74,
 				"parent" : 10
 			},
 			{
@@ -108,7 +108,7 @@
 				"command" : 9,
 				"file" : 2,
 				"line" : 33,
-				"parent" : 10
+				"parent" : 8
 			}
 		]
 	},
@@ -1428,11 +1428,11 @@
 		},
 		{
 			"backtrace" : 9,
-			"id" : "pico-coremark-div4_padded_checksummed_asm::@6890427a1f51a3e7e1df"
+			"id" : "Direct-digital-synthesis_R2RDAC_pio_h::@6890427a1f51a3e7e1df"
 		},
 		{
 			"backtrace" : 11,
-			"id" : "Direct-digital-synthesis_R2RDAC_pio_h::@6890427a1f51a3e7e1df"
+			"id" : "pico-coremark-div4_padded_checksummed_asm::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "Direct-digital-synthesis::@6890427a1f51a3e7e1df",
