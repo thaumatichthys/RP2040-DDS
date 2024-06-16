@@ -1,0 +1,13 @@
+# Target labels
+ ELF2UF2Build
+# Source files and their labels
+C:/rpi pico/dds/build/CMakeFiles/ELF2UF2Build
+C:/rpi pico/dds/build/CMakeFiles/ELF2UF2Build.rule
+C:/rpi pico/dds/build/CMakeFiles/ELF2UF2Build-complete.rule
+C:/rpi pico/dds/build/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-build.rule
+C:/rpi pico/dds/build/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-configure.rule
+C:/rpi pico/dds/build/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-download.rule
+C:/rpi pico/dds/build/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-install.rule
+C:/rpi pico/dds/build/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-mkdir.rule
+C:/rpi pico/dds/build/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-patch.rule
+C:/rpi pico/dds/build/elf2uf2/src/ELF2UF2Build-stamp/ELF2UF2Build-update.rule

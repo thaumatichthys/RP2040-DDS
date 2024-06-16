@@ -1,0 +1,21 @@
+.program R2RDAC
+
+
+.wrap_target
+    pull block
+    out pins, 8
+.wrap 
+
+% c-sdk {
+    void R2RDAC_program_init(PIO pio, uint sm, uint offset, float div) {
+        const uint bitcount = 8;
+        pio_sm_config cfg = R2RDAC_program_get_default_config(offset);
+        for (int i = 0; i < bitcount; i++) {
+            pio_gpio_init(pio, i);
+        }
+        sm_config_set_out_pins(&cfg, 0, bitcount);
+        pio_sm_set_consecutive_pindirs(pio, sm, 0, bitcount, true);
+        sm_config_set_clkdiv(&cfg, div);
+        pio_sm_init(pio, sm, offset, &cfg);
+    }
+%}
