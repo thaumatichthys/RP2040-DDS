@@ -93,7 +93,6 @@ void InitDDS(uint32_t clockFreq) {
     channel_config_set_read_increment(&dma0_cfg, false);
     channel_config_set_write_increment(&dma0_cfg, false);
     channel_config_set_sniff_enable(&dma0_cfg, true);
-    //channel_config_set_chain_to(&dma0_cfg, dma1_chan);
     channel_config_set_dreq(&dma0_cfg, DREQ_PIO0_TX0);
     channel_config_set_enable(&dma0_cfg, true);
     channel_config_set_irq_quiet(&dma0_cfg, true);
@@ -103,7 +102,7 @@ void InitDDS(uint32_t clockFreq) {
     channel_config_set_transfer_data_size(&dma1_cfg, DMA_SIZE_8);
     channel_config_set_read_increment(&dma1_cfg, false);
     channel_config_set_write_increment(&dma1_cfg, false);
-    //channel_config_set_chain_to(&dma1_cfg, dma2_chan);
+    channel_config_set_dreq(&dma1_cfg, DREQ_PIO0_TX0);
     channel_config_set_enable(&dma1_cfg, true);
     channel_config_set_irq_quiet(&dma1_cfg, true);
 
@@ -118,7 +117,7 @@ void InitDDS(uint32_t clockFreq) {
     channel_config_set_transfer_data_size(&dma3_cfg, DMA_SIZE_8);
     channel_config_set_read_increment(&dma3_cfg, true);
     channel_config_set_write_increment(&dma3_cfg, false);
-    //channel_config_set_chain_to(&dma3_cfg, dma0_chan);
+    channel_config_set_dreq(&dma3_cfg, DREQ_PIO0_TX0);
     channel_config_set_enable(&dma3_cfg, true);
     channel_config_set_irq_quiet(&dma3_cfg, true);
 
