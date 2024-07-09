@@ -18,12 +18,19 @@ int main() {
 
     InitDDS(420000000);
 
-    ChangeDDSFreq(1234.567);
+    double i = 1000;
+
     
+    StartDDS();
+
     while(1) {
         gpio_put(25, 1);
-        sleep_ms(100);
+        sleep_ms(10);
         gpio_put(25, 0);
-        sleep_ms(100);
+        sleep_ms(10);
+        ChangeDDSFreq(i);
+        i *= 1.01;
+        if (i > 15000000)
+            i = 1000;
     }
 }

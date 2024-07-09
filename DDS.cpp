@@ -59,6 +59,8 @@ uint dac_offset;
 
 uint32_t dds_clock;
 
+void mConfigureDMAs();
+void mStartDMAs();
 
 void InitDDS(uint32_t clockFreq) {
     // ======================= MISC ====================== //
@@ -115,14 +117,16 @@ void InitDDS(uint32_t clockFreq) {
 
     // DMA3 config
     channel_config_set_transfer_data_size(&dma3_cfg, DMA_SIZE_8);
-    channel_config_set_read_increment(&dma3_cfg, true);
+    channel_config_set_read_increment(&dma3_cfg, false);
     channel_config_set_write_increment(&dma3_cfg, false);
     channel_config_set_dreq(&dma3_cfg, DREQ_PIO0_TX0);
     channel_config_set_enable(&dma3_cfg, true);
     channel_config_set_irq_quiet(&dma3_cfg, true);
 
     lut_address = (uint32_t) lut; // this is the "preloading" I speak of
+}
 
+void mConfigureDMAs() {
     dma_channel_configure( // writes increment to dummy, CRC summation mode; is sniffed to DMA_BASE + 0x438
         dma0_chan,
         &dma0_cfg,
@@ -146,7 +150,7 @@ void InitDDS(uint32_t clockFreq) {
     dma_channel_configure( // writes lut_address to read address of dma3
         dma2_chan,
         &dma2_cfg,
-        &dma_hw->ch[dma3_chan].al3_read_addr_trig,
+        &dma_hw->ch[dma3_chan].al1_read_addr,
         &lut_address,
         0xFFFFFFFF,
         false
@@ -162,20 +166,34 @@ void InitDDS(uint32_t clockFreq) {
     );
 }
 
+void StartDDS() {
+    mConfigureDMAs();
+    dma_channel_start(dma0_chan);
+    dma_channel_start(dma1_chan);
+    dma_channel_start(dma2_chan);
+    dma_channel_start(dma3_chan);
+}
+
+void StopDDS() {
+    dma_channel_abort(dma0_chan);
+    dma_channel_abort(dma1_chan);
+    dma_channel_abort(dma2_chan);
+    dma_channel_abort(dma3_chan);
+}
+
 uint32_t ChangeDDSFreq(double requestedFreq) {
     // See https://www.analog.com/en/resources/analog-dialogue/articles/all-about-direct-digital-synthesis.html
     // Fo = M * Fclock / (2^n) | n = 32
     increment = round(pow(2, 32) * requestedFreq / (double) dds_clock);
 
-    dma_channel_abort(dma0_chan);
-    dma_channel_abort(dma1_chan);
-    dma_channel_abort(dma2_chan);
-    dma_channel_abort(dma3_chan);
-
-    dma_channel_start(dma0_chan);
-    dma_channel_start(dma1_chan);
-    dma_channel_start(dma2_chan);
-    dma_channel_start(dma3_chan);
+    dma_channel_configure( // writes increment to dummy, CRC summation mode; is sniffed to DMA_BASE + 0x438
+        dma0_chan,
+        &dma0_cfg,
+        &dummy,
+        &increment,
+        0xFFFFFFFF,
+        true
+    );
 
     return (uint64_t) increment * dds_clock / ((uint64_t) 1 << 32);
 }
